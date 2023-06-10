@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Get the new version for the docker image
+VER="${1}"
+if [[ -z "${VER}" ]]
+then
+  echo "You have to add version when you run the script!" >&2
+  exit 0
+fi
+
 newcontainer=$(buildah from scratch)
 scratchmnt=$(buildah mount $newcontainer)
 
@@ -13,7 +21,7 @@ rm -rf $scratchmnt/var/cache/yum
 
 # get the latest web files
 rm -rf /tmp/website/ > /dev/null
-git clone git@github.com:yahya-alshamrani/devops-practice_website.git /tmp/website
+git clone https://github.com/yahya-alshamrani/devops-practice_website.git /tmp/website
 cp /tmp/website/webpage/index.html $scratchmnt/usr/share/nginx/html/
 
 rm -rf /tmp/website/
@@ -25,3 +33,16 @@ buildah config --cmd "nginx -g 'daemon off;'" $newcontainer
 # commit the image
 buildah unmount $newcontainer
 buildah commit $newcontainer nginx
+
+DOCKER_TOKEN="${XDG_RUNTIME_DIR}/containers/auth.json"
+if [[ -f "${DOCKER_TOKEN}" ]]
+then
+  buildah push nginx yahyaalshamrani/devops-practice:"${VER}"
+else
+  echo "You have to add the docker token to the path ${DOCKER_TOKEN}" >&2
+fi
+
+# Remove the local containers
+buildah rm $newcontainer
+# Remove the local image
+buildah rmi nginx
