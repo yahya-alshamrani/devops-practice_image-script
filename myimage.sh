@@ -24,13 +24,16 @@ rm -rf /tmp/website/ > /dev/null
 git clone https://github.com/yahya-alshamrani/devops-practice_website.git /tmp/website
 cp /tmp/website/webpage/index.html $scratchmnt/usr/share/nginx/html/
 
+# Change default webport 80 to 8080
+sed -i '/listen/ s/80/8080/' $scratchmnt/etc/nginx/nginx.conf
+
 rm -rf /tmp/website/
 
 # set some config info
 buildah config --label name=nginx $newcontainer
 buildah config --cmd "nginx -g 'daemon off;'" $newcontainer
 
-# commit the image
+# Commit the image
 buildah unmount $newcontainer
 buildah commit $newcontainer nginx
 
