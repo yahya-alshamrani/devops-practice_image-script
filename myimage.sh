@@ -24,8 +24,11 @@ rm -rf /tmp/website/ > /dev/null
 git clone https://github.com/yahya-alshamrani/devops-practice_website.git /tmp/website
 cp /tmp/website/webpage/index.html $scratchmnt/usr/share/nginx/html/
 
+# Allow non-root to deploy the application
 # Change default webport 80 to 8080
 sed -i '/listen/ s/80/8080/' $scratchmnt/etc/nginx/nginx.conf
+sed -i '/^pid/ s/.*/pid \/tmp\/nginx.pid;/' $scratchmnt/etc/nginx/nginx.conf
+sed -i '/^user nginx*/ d' $scratchmnt/etc/nginx/nginx.conf
 
 rm -rf /tmp/website/
 
