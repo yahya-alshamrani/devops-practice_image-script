@@ -24,15 +24,13 @@ rm -rf /tmp/website/ > /dev/null
 git clone https://github.com/yahya-alshamrani/devops-practice_website.git /tmp/website
 cp /tmp/website/webpage/index.html $scratchmnt/usr/share/nginx/html/
 
-rm -rf /tmp/website/
-
 # set some config info
 buildah config --label name=nginx $newcontainer
 buildah config --cmd "nginx -g 'daemon off;'" $newcontainer
 
 # commit the image
 buildah unmount $newcontainer
-buildah commit $newcontainer nginx
+buildah commit $newcontainer yahya/nginx
 
 DOCKER_TOKEN="${XDG_RUNTIME_DIR}/containers/auth.json"
 if [[ -f "${DOCKER_TOKEN}" ]]
